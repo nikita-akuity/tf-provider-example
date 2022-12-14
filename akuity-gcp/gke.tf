@@ -1,19 +1,19 @@
 provider "google" {
-  project     = var.project_id
-  region      = var.region
+  project     = var.google_project_id
+  region      = var.google_region
 }
 
 module "vpc" {
   source       = "terraform-google-modules/network/google"
   version      = "~> 6.0"
-  project_id   = var.project_id
+  project_id   = var.google_project_id
   network_name = "example-vpc"
 
   subnets = [
     {
       subnet_name   = "example-subnet"
-      subnet_ip     = cidrsubnet(var.cidr_base, 4, 1)
-      subnet_region = var.region
+      subnet_ip     = cidrsubnet(var.google_cidr_base, 4, 1)
+      subnet_region = var.google_region
     }
   ]
   secondary_ranges = [
@@ -42,10 +42,10 @@ provider "kubectl" {
 
 module "gke" {
   source                     = "terraform-google-modules/kubernetes-engine/google"
-  project_id                 = var.project_id
+  project_id                 = var.google_project_id
   name                       = "gke-test-1"
-  region                     = var.region
-  zones                      = var.zones
+  region                     = var.google_region
+  zones                      = var.google_zones
   network                    = module.vpc.network_name
   subnetwork                 = module.vpc.subnets_names[0]
   ip_range_pods              = "example-gke-pods"
@@ -59,7 +59,7 @@ module "gke" {
     {
       name                      = "default-node-pool"
       machine_type              = "e2-medium"
-      node_locations            = var.zones
+      node_locations            = var.google_zones
       min_count                 = 3
       max_count                 = 6
       local_ssd_count           = 0
