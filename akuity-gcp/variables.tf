@@ -6,11 +6,14 @@ variable "project_id" {
 variable "region" {
   description = "The GCP region to create and test resources in"
   type        = string
-  default     = "us-central1"
 }
 
-variable "zone" {
-  description = "The GCP zone to create resources in"
-  type        = string
-  default     = null
+variable "zones" {
+  description = "The GCP zones to create resources in"
+  type        = map(string)
+}
+
+variable "cidr_base" {
+    description = "Base cidr for creatinf subnets"
+    type        = string
 }
