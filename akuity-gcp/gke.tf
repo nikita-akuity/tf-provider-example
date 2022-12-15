@@ -44,4 +44,31 @@ module "gke" {
   network_policy             = false
   horizontal_pod_autoscaling = true
   filestore_csi_driver       = false
+  node_pools = [{
+    name                     = "spot-pool"
+    machine_type             = "e2-medium"
+    node_locations           = join(",",var.google_zones)
+    min_count                = 1
+    max_count                = 3
+    local_ssd_count          = 0
+    spot                     = true
+    disk_size_gb             = 100
+    disk_type                = "pd-standard"
+    image_type               = "COS_CONTAINERD"
+    preemptible              = false
+    initial_node_count       = 1
+    location_policy          = "ANY"
+  }]
+  node_pools_oauth_scopes = {
+    all = [
+      "https://www.googleapis.com/auth/logging.write",
+      "https://www.googleapis.com/auth/monitoring",
+    ]
+  }
+  node_pools_labels = {
+    all = {}
+    spot-pool = {
+      spot = true
+    }
+  }
 }

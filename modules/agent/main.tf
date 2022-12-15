@@ -3,7 +3,7 @@ data "kubectl_file_documents" "agent" {
 }
 
 resource "kubectl_manifest" "agent_namespace" {
-    yaml_body = lookup(data.kubectl_file_documents.agent.manifests, "/api/v1/namespaces/${var.namespace}/namespaces/${var.namespace}")
+    yaml_body = element(data.kubectl_file_documents.agent.documents, 0)
     wait      = true
 }
 

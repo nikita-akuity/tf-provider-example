@@ -16,7 +16,7 @@ locals {
   expanded_layout = {
     for cloud, envs in local.example_layout : cloud => {
       for env_name, count in envs : env_name => [
-        for i in range(count) : format("%s-%s-%02d", cloud, env_name, i+1)
+        for i in range(count) : format("%s-%s-%02d", env_name, cloud, i+1)
       ]
     }
   }
@@ -80,6 +80,5 @@ module "gcp_agent" {
   providers = {
     kubectl = kubectl.gke_1
   }
-  namespace = each.value.namespace
   manifests = each.value.manifests
 }
