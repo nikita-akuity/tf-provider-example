@@ -31,14 +31,24 @@ locals {
         ]
     ])
   }
-}
-
-provider akp {
-  org_name = var.akuity_org_name
-}
-
-data "akp_instance" "argocd" {
-  name    = "tf-managed-demo"
+  gcp_clusters = {
+    for cluster in local.flatten_layout.gcp : cluster.cluster_name => {
+      namespace = cluster.namespace
+      env = cluster.env_name
+    }
+  }
+  aws_clusters = {
+    for cluster in local.flatten_layout.aws : cluster.cluster_name => {
+      namespace = cluster.namespace
+      env = cluster.env_name
+    }
+  }
+  azure_clusters = {
+    for cluster in local.flatten_layout.azure : cluster.cluster_name => {
+      namespace = cluster.namespace
+      env = cluster.env_name
+    }
+  }
 }
 
 data "google_client_config" "default" {}
@@ -51,16 +61,24 @@ provider "kubectl" {
   load_config_file       = false
 }
 
-resource "akp_cluster" "gcp_cluster" {
-  for_each         = {for cluster in local.flatten_layout.gcp : cluster.cluster_name => {
-    namespace = cluster.namespace
-    env = cluster.env_name
-  }}
+provider akp {
+  org_name = var.akuity_org_name
+}
+
+data "akp_instance" "argocd" {
+  name    = "tf-managed-demo"
+}
+
+module "gcp_cluster_agent" {
+  for_each    = local.gcp_clusters
+  source    = "../modules/cluster-agent"
+  providers = {
+    kubectl = kubectl.gke_1
+  }
   instance_id      = data.akp_instance.argocd.id
   name             = each.key
   namespace        = each.value.namespace
   namespace_scoped = true
-  size             = "small"
   labels = {
     cloud = "gcp"
     env   = each.value.env
@@ -68,16 +86,4 @@ resource "akp_cluster" "gcp_cluster" {
   annotations = {
     managed-namespace = each.value.namespace
   }
-  depends_on = [
-    module.gke
-  ]
-}
-
-module "gcp_agent" {
-  for_each  = akp_cluster.gcp_cluster
-  source    = "../modules/agent"
-  providers = {
-    kubectl = kubectl.gke_1
-  }
-  manifests = each.value.manifests
 }
