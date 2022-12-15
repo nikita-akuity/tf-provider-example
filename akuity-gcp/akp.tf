@@ -37,9 +37,8 @@ provider akp {
   org_name = var.akuity_org_name
 }
 
-resource "akp_instance" "argocd" {
-  name    = "tf-managed-example"
-  version = "v2.5.3"
+data "akp_instance" "argocd" {
+  name    = "tf-managed-demo"
 }
 
 data "google_client_config" "default" {}
@@ -57,11 +56,11 @@ resource "akp_cluster" "gcp_cluster" {
     namespace = cluster.namespace
     env = cluster.env_name
   }}
+  instance_id      = data.akp_instance.argocd.id
   name             = each.key
-  namespace_scoped = true
   namespace        = each.value.namespace
+  namespace_scoped = true
   size             = "small"
-  instance_id      = akp_instance.argocd.id
   labels = {
     cloud = "gcp"
     env   = each.value.env

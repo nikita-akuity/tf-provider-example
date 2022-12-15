@@ -31,7 +31,8 @@ module "vpc" {
 }
 
 module "gke" {
-  source                     = "terraform-google-modules/kubernetes-engine/google"
+  source                     = "terraform-google-modules/kubernetes-engine/google//modules/private-cluster"
+  version                    = "24.1.0"
   project_id                 = var.google_project_id
   name                       = "gke-test-1"
   region                     = var.google_region
@@ -44,6 +45,8 @@ module "gke" {
   network_policy             = false
   horizontal_pod_autoscaling = true
   filestore_csi_driver       = false
+  enable_private_endpoint    = false
+  enable_private_nodes       = true
   node_pools = [{
     name                     = "spot-pool"
     machine_type             = "e2-medium"
