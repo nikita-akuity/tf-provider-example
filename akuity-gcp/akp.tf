@@ -1,5 +1,36 @@
 locals {
-  gcp_cluster_num = 1
+  example_layout = {
+    gcp = {
+      dev = 2
+      stage = 1
+    }
+    aws = {
+      dev = 1
+      stage = 1
+    }
+    azure = {
+      dev = 0
+      stage = 1
+    }
+  }
+  expanded_layout = {
+    for cloud, envs in local.example_layout : cloud => {
+      for env_name, count in envs : env_name => [
+        for i in range(count) : format("%s-%s-%02d", cloud, env_name, i+1)
+      ]
+    }
+  }
+  flatten_layout = {
+    for cloud, clusters in local.expanded_layout : cloud => flatten([
+        for env_name, cluster_names in clusters: [
+            for i, cluster_name in cluster_names : {
+                env_name = env_name
+                cluster_name = cluster_name
+                namespace = format("akuity-%s-%02d",env_name, i+1)
+            }
+        ]
+    ])
+  }
 }
 
 provider akp {
@@ -22,14 +53,21 @@ provider "kubectl" {
 }
 
 resource "akp_cluster" "gcp_cluster" {
-  for_each         = toset([for x in range(local.gcp_cluster_num): tostring(x)])
-  name             = "gcp-cluster-${each.value}"
+  for_each         = {for cluster in local.flatten_layout.gcp : cluster.cluster_name => {
+    namespace = cluster.namespace
+    env = cluster.env_name
+  }}
+  name             = each.key
   namespace_scoped = true
-  namespace        = "akuity-gcp-${each.value}"
+  namespace        = each.value.namespace
   size             = "small"
   instance_id      = akp_instance.argocd.id
   labels = {
     cloud = "gcp"
+    env   = each.value.env
+  }
+  annotations = {
+    managed-namespace = each.value.namespace
   }
   depends_on = [
     module.gke
