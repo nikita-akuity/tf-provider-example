@@ -30,11 +30,28 @@ module "vpc" {
   }
 }
 
+resource "google_compute_router" "router" {
+  project = var.google_project_id
+  name    = "router-${var.google_region}"
+  network = module.vpc.network_self_link
+  region  = var.google_region
+}
+
+module "cloud-nat" {
+  source                             = "terraform-google-modules/cloud-nat/google"
+  version                            = "~> 2.0"
+  project_id                         = var.google_project_id
+  region                             = var.google_region
+  router                             = google_compute_router.router.name
+  name                               = "nat-${var.google_region}"
+  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
+}
+
 module "gke" {
   source                     = "terraform-google-modules/kubernetes-engine/google//modules/private-cluster"
   version                    = "24.1.0"
   project_id                 = var.google_project_id
-  name                       = "gke-test-1"
+  name                       = "gke-example-1"
   region                     = var.google_region
   zones                      = var.google_zones
   network                    = module.vpc.network_name
@@ -48,8 +65,8 @@ module "gke" {
   enable_private_endpoint    = false
   enable_private_nodes       = true
   node_pools = [{
-    name                     = "spot-pool"
-    machine_type             = "e2-medium"
+    name                     = "spot-cpu-pool"
+    machine_type             = "e2-highcpu-4"
     node_locations           = join(",",var.google_zones)
     min_count                = 1
     max_count                = 3
@@ -70,8 +87,9 @@ module "gke" {
   }
   node_pools_labels = {
     all = {}
-    spot-pool = {
+    spot-cpu-pool = {
       spot = true
+      highcpu = true
     }
   }
 }
