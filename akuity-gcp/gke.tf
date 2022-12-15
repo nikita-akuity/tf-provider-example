@@ -11,9 +11,10 @@ module "vpc" {
 
   subnets = [
     {
-      subnet_name   = "example-subnet"
-      subnet_ip     = cidrsubnet(var.google_cidr_base, 4, 1)
-      subnet_region = var.google_region
+      subnet_name           = "example-subnet"
+      subnet_ip             = cidrsubnet(var.google_cidr_base, 4, 1)
+      subnet_region         = var.google_region
+      subnet_private_access = true
     }
   ]
   secondary_ranges = {
