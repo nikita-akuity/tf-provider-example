@@ -30,14 +30,6 @@ module "vpc" {
   }
 }
 
-data "google_client_config" "default" {}
-
-provider "kubectl" {
-  host                   = "https://${module.gke.endpoint}"
-  token                  = data.google_client_config.default.access_token
-  cluster_ca_certificate = base64decode(module.gke.ca_certificate)
-}
-
 module "gke" {
   source                     = "terraform-google-modules/kubernetes-engine/google"
   project_id                 = var.google_project_id
