@@ -9,7 +9,7 @@ locals {
       stage = 0
     }
     azure = {
-      dev = 0
+      dev = 1
       stage = 0
     }
   }
@@ -73,6 +73,17 @@ provider "kubectl" {
   load_config_file       = false
 }
 
+provider "kubectl" {
+  alias                  = "aks_1"
+  host                   = azurerm_kubernetes_cluster.example.kube_config.0.host
+  username               = azurerm_kubernetes_cluster.example.kube_config.0.username
+  password               = azurerm_kubernetes_cluster.example.kube_config.0.password
+  client_certificate     = base64decode(azurerm_kubernetes_cluster.example.kube_config.0.client_certificate)
+  client_key             = base64decode(azurerm_kubernetes_cluster.example.kube_config.0.client_key)
+  cluster_ca_certificate = base64decode(azurerm_kubernetes_cluster.example.kube_config.0.cluster_ca_certificate)
+  load_config_file       = false
+}
+
 provider akp {
   org_name = var.akuity_org_name
 }
@@ -112,6 +123,25 @@ module "aws_cluster_agent" {
   namespace_scoped = true
   labels = {
     cloud = "aws"
+    env   = each.value.env
+  }
+  annotations = {
+    managed-namespace = each.value.namespace
+  }
+}
+
+module "azure_cluster_agent" {
+  for_each    = local.azure_clusters
+  source    = "../modules/cluster-agent"
+  providers = {
+    kubectl = kubectl.aks_1
+  }
+  instance_id      = data.akp_instance.argocd.id
+  name             = each.key
+  namespace        = each.value.namespace
+  namespace_scoped = true
+  labels = {
+    cloud = "azure"
     env   = each.value.env
   }
   annotations = {

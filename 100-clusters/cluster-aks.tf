@@ -61,4 +61,9 @@ resource "azurerm_kubernetes_cluster_node_pool" "cpu" {
   max_count             = 6
   node_count            = 2
   vnet_subnet_id        = azurerm_subnet.internal.id
+  lifecycle {
+    ignore_changes = [
+      node_count,
+    ]
+  }
 }
