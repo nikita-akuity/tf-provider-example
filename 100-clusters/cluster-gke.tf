@@ -4,6 +4,7 @@ provider "google" {
 }
 
 locals {
+  gke_cluster_name = "gke-example-1"
   gke_subnet_name = "example-subnet"
   gke_pods_range_name = "example-gke-pods"
   gke_services_range_name = "example-gke-services"
@@ -58,7 +59,7 @@ module "gke" {
   source                     = "terraform-google-modules/kubernetes-engine/google//modules/private-cluster"
   version                    = "24.1.0"
   project_id                 = var.google_project_id
-  name                       = "gke-example-1"
+  name                       = local.gke_cluster_name
   region                     = var.google_region
   zones                      = var.google_zones
   network                    = module.gcp_vpc.network_name
