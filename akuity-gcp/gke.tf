@@ -3,7 +3,13 @@ provider "google" {
   region      = var.google_region
 }
 
-module "vpc" {
+locals {
+  gke_subnet_name = "example-subnet"
+  gke_pods_range_name = "example-gke-pods"
+  gke_services_range_name = "example-gke-services"
+}
+
+module "gcp_vpc" {
   source       = "terraform-google-modules/network/google"
   version      = "~> 6.0"
   project_id   = var.google_project_id
@@ -11,7 +17,7 @@ module "vpc" {
 
   subnets = [
     {
-      subnet_name           = "example-subnet"
+      subnet_name           = local.gke_subnet_name
       subnet_ip             = cidrsubnet(var.google_cidr_base, 4, 1)
       subnet_region         = var.google_region
       subnet_private_access = true
@@ -20,11 +26,11 @@ module "vpc" {
   secondary_ranges = {
     example-subnet = [
       {
-        range_name = "example-gke-pods"
+        range_name = local.gke_pods_range_name
         ip_cidr_range = "192.168.64.0/20"
       },
       {
-        range_name = "example-gke-services"
+        range_name = local.gke_services_range_name
         ip_cidr_range = "192.168.80.0/24"
       }
     ]
@@ -34,7 +40,7 @@ module "vpc" {
 resource "google_compute_router" "router" {
   project = var.google_project_id
   name    = "router-${var.google_region}"
-  network = module.vpc.network_self_link
+  network = module.gcp_vpc.network_self_link
   region  = var.google_region
 }
 
@@ -55,10 +61,10 @@ module "gke" {
   name                       = "gke-example-1"
   region                     = var.google_region
   zones                      = var.google_zones
-  network                    = module.vpc.network_name
-  subnetwork                 = module.vpc.subnets_names[0]
-  ip_range_pods              = "example-gke-pods"
-  ip_range_services          = "example-gke-services"
+  network                    = module.gcp_vpc.network_name
+  subnetwork                 = local.gke_subnet_name
+  ip_range_pods              = local.gke_pods_range_name
+  ip_range_services          = local.gke_services_range_name
   http_load_balancing        = false
   network_policy             = false
   horizontal_pod_autoscaling = true

@@ -61,6 +61,18 @@ provider "kubectl" {
   load_config_file       = false
 }
 
+data "aws_eks_cluster_auth" "default" {
+  name = local.eks_cluster_name
+}
+
+provider "kubectl" {
+  alias                  = "eks_1"
+  host                   = "https://${module.eks.cluster_endpoint}"
+  token                  = data.aws_eks_cluster_auth.default.token
+  cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
+  load_config_file       = false
+}
+
 provider akp {
   org_name = var.akuity_org_name
 }
@@ -81,6 +93,25 @@ module "gcp_cluster_agent" {
   namespace_scoped = true
   labels = {
     cloud = "gcp"
+    env   = each.value.env
+  }
+  annotations = {
+    managed-namespace = each.value.namespace
+  }
+}
+
+module "aws_cluster_agent" {
+  for_each    = local.aws_clusters
+  source    = "../modules/cluster-agent"
+  providers = {
+    kubectl = kubectl.eks_1
+  }
+  instance_id      = data.akp_instance.argocd.id
+  name             = each.key
+  namespace        = each.value.namespace
+  namespace_scoped = true
+  labels = {
+    cloud = "aws"
     env   = each.value.env
   }
   annotations = {
