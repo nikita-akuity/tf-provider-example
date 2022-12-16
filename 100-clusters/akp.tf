@@ -67,7 +67,7 @@ data "aws_eks_cluster_auth" "default" {
 
 provider "kubectl" {
   alias                  = "eks_1"
-  host                   = "https://${module.eks.cluster_endpoint}"
+  host                   = module.eks.cluster_endpoint
   token                  = data.aws_eks_cluster_auth.default.token
   cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
   load_config_file       = false
