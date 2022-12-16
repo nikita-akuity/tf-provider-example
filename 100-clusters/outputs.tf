@@ -12,3 +12,8 @@ output gcp_clusters {
   value       = local.gcp_clusters
   description = "List of GKE clusters"
 }
+
+output argocd_url {
+  value       = data.akp_instance.argocd.hostname
+  description = "Url of Argo CD instance"
+}
