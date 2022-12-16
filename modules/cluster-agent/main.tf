@@ -1,3 +1,7 @@
+locals {
+    manifest_count = 31
+}
+
 resource "akp_cluster" "cluster" {
   instance_id      = var.instance_id
   name             = var.name
@@ -18,8 +22,8 @@ resource "kubectl_manifest" "agent_namespace" {
 }
 
 resource "kubectl_manifest" "agent" {
-    count     = 31
-    yaml_body = element(data.kubectl_file_documents.agent.documents, count.index)
+    count     = local.manifest_count - 1
+    yaml_body = element(data.kubectl_file_documents.agent.documents, count.index + 1)
     # Important!
     wait_for_rollout = false
     depends_on = [
