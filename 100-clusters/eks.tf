@@ -40,18 +40,15 @@ module "eks" {
   version = "~> 19.0"
 
   cluster_name    = local.eks_cluster_name
-  cluster_version = "1.23"
+  cluster_version = "1.24"
 
   cluster_endpoint_private_access = true
   cluster_endpoint_public_access  = true
 
   enable_irsa = true
   eks_managed_node_groups = {
-    spot = {
+    cpu-high = {
       instance_types = ["c5.xlarge"]
-      instance_market_options = {
-        market_type = "spot"
-      }
       create_security_group = false
       min_size     = 2
       max_size     = 6
