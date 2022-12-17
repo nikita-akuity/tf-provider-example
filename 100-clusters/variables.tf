@@ -8,11 +8,6 @@ variable "google_region" {
   type        = string
 }
 
-variable "google_zones" {
-  description = "The GCP zones to create resources in"
-  type        = list(string)
-}
-
 variable "google_cidr_base" {
     description = "Base cidr for creating subnets"
     type        = string
@@ -21,11 +16,6 @@ variable "google_cidr_base" {
 variable "aws_region" {
   description = "The AWS region to create and test resources in"
   type        = string
-}
-
-variable "aws_zones" {
-  description = "The AWS zones to create resources in"
-  type        = list(string)
 }
 
 variable "aws_cidr_base" {

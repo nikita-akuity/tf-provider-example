@@ -3,9 +3,10 @@ provider "azurerm" {
 }
 
 locals {
-  aks_cluster_name = "aks-example-1"
-  aks_subnet_name = "example-subnet"
-  aks_dns_prefix = "aks1"
+  aks_cluster_name = "aks-terraform-example-1"
+  aks_network_name = "example-terraform-network"
+  aks_subnet_name  = "example-terraform-subnet"
+  aks_dns_prefix   = "aks1"
 }
 
 resource "azurerm_resource_group" "example" {
@@ -14,7 +15,7 @@ resource "azurerm_resource_group" "example" {
 }
 
 resource "azurerm_virtual_network" "example" {
-  name                = "example-network"
+  name                = local.aks_network_name
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
   address_space       = [var.azure_cidr_base]

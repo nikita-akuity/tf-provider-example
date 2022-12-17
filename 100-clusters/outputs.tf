@@ -14,6 +14,6 @@ output gcp_clusters {
 }
 
 output argocd_url {
-  value       = data.akp_instance.argocd.hostname
+  value       = "https://${data.akp_instance.argocd.hostname}"
   description = "Url of Argo CD instance"
 }

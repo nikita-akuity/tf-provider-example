@@ -4,8 +4,8 @@ provider "google" {
 }
 
 locals {
-  gke_cluster_name = "gke-example-1"
-  gke_subnet_name = "example-subnet"
+  gke_cluster_name = "gke-terraform-example-1"
+  gke_subnet_name = "example-terraform-subnet"
   gke_pods_range_name = "example-gke-pods"
   gke_services_range_name = "example-gke-services"
 }
@@ -25,7 +25,7 @@ module "gcp_vpc" {
     }
   ]
   secondary_ranges = {
-    example-subnet = [
+    (local.gke_subnet_name) = [
       {
         range_name = local.gke_pods_range_name
         ip_cidr_range = "192.168.64.0/20"
@@ -61,7 +61,6 @@ module "gke" {
   project_id                 = var.google_project_id
   name                       = local.gke_cluster_name
   region                     = var.google_region
-  zones                      = var.google_zones
   network                    = module.gcp_vpc.network_name
   subnetwork                 = local.gke_subnet_name
   ip_range_pods              = local.gke_pods_range_name
@@ -75,7 +74,6 @@ module "gke" {
   node_pools = [{
     name                     = "spot-pool"
     machine_type             = "e2-standard-8"
-    node_locations           = join(",",var.google_zones)
     min_count                = 0
     max_count                = 5
     local_ssd_count          = 0
@@ -100,4 +98,7 @@ module "gke" {
       highcpu = true
     }
   }
+  depends_on = [
+    module.gcp_vpc
+  ]
 }

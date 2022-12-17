@@ -3,24 +3,27 @@ provider aws {
 }
 
 locals {
-  eks_cluster_name = "eks-example-1"
-  partition        = data.aws_partition.current.partition
-  private_subnets  = [for i in range(length(var.aws_zones)) : cidrsubnet(var.aws_cidr_base, 5, i)]
-  public_subnets  = [for i in range(length(var.aws_zones)) : cidrsubnet(var.aws_cidr_base, 5, i+length(var.aws_zones))]
+  eks_cluster_name = "eks-terraform-example-1"
+  aws_network_name = "example-terraform-network"
+  aws_zones        = data.aws_availability_zones.available.names
+  aws_private_subnets  = [for i in range(length(local.aws_zones)) : cidrsubnet(var.aws_cidr_base, 5, i)]
+  aws_public_subnets   = [for i in range(length(local.aws_zones)) : cidrsubnet(var.aws_cidr_base, 5, i+length(local.aws_zones))]
 }
 
-data "aws_partition" "current" {}
+data "aws_availability_zones" "available" {
+  state = "available"
+}
 
 module "aws_vpc" {
   source = "terraform-aws-modules/vpc/aws"
   version = "3.18.1"
 
-  name = "example-network"
+  name = local.aws_network_name
   cidr = var.aws_cidr_base
 
-  azs               = var.aws_zones
-  private_subnets   = local.private_subnets
-  public_subnets    = local.public_subnets
+  azs               = local.aws_zones
+  private_subnets   = local.aws_private_subnets
+  public_subnets    = local.aws_public_subnets
 
   enable_nat_gateway     = true
   single_nat_gateway     = true
@@ -154,7 +157,7 @@ resource "kubectl_manifest" "karpenter_provisioner" {
   apiVersion: karpenter.sh/v1alpha5
   kind: Provisioner
   metadata:
-    name: default
+    name: tf-example
   spec:
     requirements:
       - key: karpenter.sh/capacity-type
@@ -164,7 +167,7 @@ resource "kubectl_manifest" "karpenter_provisioner" {
       resources:
         cpu: 1000
     providerRef:
-        name: default
+        name: tf-example
     ttlSecondsAfterEmpty: 30
   YAML
 
@@ -179,7 +182,7 @@ resource "kubectl_manifest" "karpenter_node_template" {
     apiVersion: karpenter.k8s.aws/v1alpha1
     kind: AWSNodeTemplate
     metadata:
-      name: default
+      name: tf-example
     spec:
       subnetSelector:
         karpenter.sh/discovery: "true"
