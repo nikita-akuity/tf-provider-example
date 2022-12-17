@@ -1,19 +1,13 @@
 locals {
   example_layout = {
     gcp = {
-      dev = 9
-      stage = 10
-      prod = 14
+
     }
     aws = {
-      dev = 9
-      stage = 10
-      prod = 14
+
     }
     azure = {
-      dev = 10
-      stage = 11
-      prod = 13
+
     }
   }
   expanded_layout = {
