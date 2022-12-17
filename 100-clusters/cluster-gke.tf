@@ -73,11 +73,11 @@ module "gke" {
   enable_private_endpoint    = false
   enable_private_nodes       = true
   node_pools = [{
-    name                     = "spot-cpu-pool"
-    machine_type             = "e2-highcpu-4"
+    name                     = "spot-pool"
+    machine_type             = "e2-standard-8"
     node_locations           = join(",",var.google_zones)
-    min_count                = 1
-    max_count                = 3
+    min_count                = 0
+    max_count                = 5
     local_ssd_count          = 0
     spot                     = true
     disk_size_gb             = 100
