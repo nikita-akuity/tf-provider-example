@@ -1,0 +1,40 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: guestbook-one
+spec:
+  generators:
+  - clusters:
+      selector:
+        matchLabels:
+          env: 'dev'
+  - clusters:
+      selector:
+        matchLabels:
+          env: 'stage'
+  - clusters:
+      selector:
+        matchLabels:
+          env: 'prod'
+  template:
+    metadata:
+      name: 'gb-one-{{nameNormalized}}'
+      labels:
+        cloud: '{{metadata.labels.cloud}}'
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io
+    spec:
+      project: '{{metadata.labels.env}}'
+      source:
+        repoURL: https://github.com/nikita-akuity/guestbook-delivery.git
+        targetRevision: HEAD
+        path: 'env/{{metadata.labels.env}}'
+        kustomize:
+          namePrefix: gbone-
+      destination:
+        server: '{{server}}'
+        namespace: '{{metadata.annotations.managed-namespace}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
