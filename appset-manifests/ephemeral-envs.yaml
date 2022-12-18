@@ -1,0 +1,36 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: ephemeral-envs
+spec:
+  generators:
+  - matrix:
+      generators:
+      - pullRequest:
+          github:
+            owner: nikita-akuity
+            repo: private-repo-pr-test
+            tokenRef:
+              secretName: argocd-secret
+              key: github-pat
+      - clusters:
+          selector:
+            matchLabels:
+              preview: 'true'
+  template:
+    metadata:
+      name: 'guestbook-pr-{{number}}'
+    spec:
+      project: dev
+      source:
+        repoURL: https://github.com/nikita-akuity/guestbook-delivery.git
+        targetRevision: main
+        path: 'env/dev'
+        kustomize:
+          namePrefix: pr-{{number}}-
+      destination:
+        server: '{{server}}'
+        namespace: '{{metadata.annotations.managed-namespace}}'
+      syncPolicy:
+        automated:
+          prune: true
