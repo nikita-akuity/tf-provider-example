@@ -1,7 +1,7 @@
 locals {
   example_layout = {
     gcp = {
-      dev   = 1
+      dev   = 0
       stage = 0
       prod  = 0
     }
