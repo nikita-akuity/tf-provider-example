@@ -1,19 +1,19 @@
 locals {
   example_layout = {
     gcp = {
-      dev   = 1
-      stage = 0
-      prod  = 0
+      dev   = 4
+      stage = 4
+      prod  = 4
     }
     aws = {
-      dev   = 0
-      stage = 0
-      prod  = 0
+      dev   = 4
+      stage = 4
+      prod  = 4
     }
     azure = {
-      dev   = 0
-      stage = 0
-      prod  = 0
+      dev   = 4
+      stage = 4
+      prod  = 4
     }
   }
   expanded_layout = {
@@ -107,7 +107,7 @@ module "gcp_cluster_agent" {
   namespace_scoped = true
   labels = {
     cloud = "gcp"
-    env   = each.value.env
+    # env   = each.value.env
   }
   annotations = {
     managed-namespace = each.value.namespace
@@ -126,7 +126,7 @@ module "aws_cluster_agent" {
   namespace_scoped = true
   labels = {
     cloud = "aws"
-    env   = each.value.env
+    # env   = each.value.env
   }
   annotations = {
     managed-namespace = each.value.namespace
@@ -145,7 +145,7 @@ module "azure_cluster_agent" {
   namespace_scoped = true
   labels = {
     cloud = "azure"
-    env   = each.value.env
+    # env   = each.value.env
   }
   annotations = {
     managed-namespace = each.value.namespace
