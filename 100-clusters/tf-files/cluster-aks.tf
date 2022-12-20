@@ -3,14 +3,14 @@ provider "azurerm" {
 }
 
 locals {
-  aks_cluster_name = "aks-terraform-example-1"
-  aks_network_name = "example-terraform-network"
-  aks_subnet_name  = "example-terraform-subnet"
-  aks_dns_prefix   = "aks1"
+  aks_cluster_name = "terraform-example-100-clusters"
+  aks_network_name = "terraform-example-100-clusters"
+  aks_subnet_name  = "terraform-example-100-clusters"
+  aks_dns_prefix   = "aks100"
 }
 
 resource "azurerm_resource_group" "example" {
-  name     = "akuity-k8s-test"
+  name     = "terraform-example-100-clusters"
   location = var.azure_region
 }
 
