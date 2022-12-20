@@ -1,0 +1,52 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: 1-cluster-guestbook
+spec:
+  generators:
+  - clusters:
+      selector:
+        matchLabels:
+          example: 1-cluster
+          dev: 'true'
+      values:
+        env: dev
+        project: 1-cluster-dev
+  - clusters:
+      selector:
+        matchLabels:
+          example: 1-cluster
+          stage: 'true'
+      values:
+        env: stage
+        project: 1-cluster-stage
+  - clusters:
+      selector:
+        matchLabels:
+          example: 1-cluster
+          prod: 'true'
+      values:
+        env: prod
+        project: 1-cluster-prod
+  template:
+    metadata:
+      name: 'guestbook-{{values.env}}'
+      labels:
+        cloud: '{{metadata.labels.cloud}}'
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io
+    spec:
+      project: '{{values.project}}'
+      source:
+        repoURL: https://github.com/nikita-akuity/guestbook-delivery.git
+        targetRevision: HEAD
+        path: 'env/{{values.env}}'
+      destination:
+        server: '{{server}}'
+        namespace: '{{values.env}}-guestbook'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+        - CreateNamespace=true
