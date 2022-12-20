@@ -1,12 +1,12 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: appsets
+  name: 100-clusters-appsets
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
-  project: default
+  project: 100-clusters-default
   source:
     repoURL: https://github.com/nikita-akuity/tf-provider-example
     targetRevision: HEAD
