@@ -1,5 +1,5 @@
 local project = std.parseYaml(importstr 'lib/project.yaml');
-local envs = ['dev', 'stage', 'prod'];
+local envs = ['dev', 'stage', 'prod', 'preview'];
 [
     project {
         metadata+: {

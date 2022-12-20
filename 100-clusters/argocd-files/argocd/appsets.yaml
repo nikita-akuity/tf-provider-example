@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: https://github.com/nikita-akuity/tf-provider-example
     targetRevision: HEAD
-    path: appset-manifests
+    path: 100-clusters/argocd-files/appset-manifests
   destination:
     name: in-cluster
     namespace: argocd

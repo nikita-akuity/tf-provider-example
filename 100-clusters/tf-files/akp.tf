@@ -97,7 +97,7 @@ data "akp_instance" "argocd" {
 
 module "gcp_cluster_agent" {
   for_each    = local.gcp_clusters
-  source    = "../modules/cluster-agent"
+  source    = "../../modules/cluster-agent"
   providers = {
     kubectl = kubectl.gke_1
   }
@@ -116,7 +116,7 @@ module "gcp_cluster_agent" {
 
 module "aws_cluster_agent" {
   for_each    = local.aws_clusters
-  source    = "../modules/cluster-agent"
+  source    = "../../modules/cluster-agent"
   providers = {
     kubectl = kubectl.eks_1
   }
@@ -135,7 +135,7 @@ module "aws_cluster_agent" {
 
 module "azure_cluster_agent" {
   for_each    = local.azure_clusters
-  source    = "../modules/cluster-agent"
+  source    = "../../modules/cluster-agent"
   providers = {
     kubectl = kubectl.aks_1
   }
