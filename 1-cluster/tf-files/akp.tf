@@ -1,19 +1,15 @@
-provider "kubernetes" {
+provider "kubectl" {
   host                   = azurerm_kubernetes_cluster.example.kube_config.0.host
   username               = azurerm_kubernetes_cluster.example.kube_config.0.username
   password               = azurerm_kubernetes_cluster.example.kube_config.0.password
   client_certificate     = base64decode(azurerm_kubernetes_cluster.example.kube_config.0.client_certificate)
   client_key             = base64decode(azurerm_kubernetes_cluster.example.kube_config.0.client_key)
   cluster_ca_certificate = base64decode(azurerm_kubernetes_cluster.example.kube_config.0.cluster_ca_certificate)
+  load_config_file       = false
 }
 
 provider akp {
   org_name = var.akuity_org_name
-}
-
-
-locals {
-  agent_manifests = [ for manifest in split("---", akp_cluster.cluster.manifests) :  yamldecode(manifest)]
 }
 
 data "akp_instance" "argocd" {
@@ -34,19 +30,31 @@ resource "akp_cluster" "cluster" {
   }
 }
 
-resource "kubernetes_manifest" "agent_namespace" {
-  manifest = local.agent_manifests[0]
-  wait {
-    fields = {
-      "status.phase" = "Active"
-    }
-  }
+data "kubectl_file_documents" "agent" {
+    content = akp_cluster.cluster.manifests
 }
 
-resource "kubernetes_manifest" "agent" {
-    count    = 30
-    manifest = element(local.agent_manifests, count.index + 1)
+resource "kubectl_manifest" "agent_namespace" {
+    yaml_body = element(data.kubectl_file_documents.agent.documents, 0)
+    wait      = true
+    lifecycle {
+      ignore_changes = [
+        yaml_body
+      ]
+    }
+}
+
+resource "kubectl_manifest" "agent" {
+    count     = 30
+    yaml_body = element(data.kubectl_file_documents.agent.documents, count.index + 1)
+    # Important!
+    wait_for_rollout = false
     depends_on = [
-        kubernetes_manifest.agent_namespace
+        kubectl_manifest.agent_namespace
     ]
+    lifecycle {
+      ignore_changes = [
+        yaml_body
+      ]
+    }
 }
