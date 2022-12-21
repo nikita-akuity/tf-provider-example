@@ -22,7 +22,7 @@ resource "akp_cluster" "cluster" {
   namespace        = "akuity"
   size             = "small"
   labels           = {
-    example = "1-cluster"
+    # example = "1-cluster"
     cloud   = "azure"
     dev     = "true"
     stage   = "true"
