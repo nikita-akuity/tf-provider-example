@@ -14,8 +14,8 @@ variable "google_cidr_base" {
 }
 
 variable "akuity_org_name" {
-    description = "Organization name in Akuity Platform"
-    type        = string
+  description = "Organization name in Akuity Platform"
+  type        = string
 }
 
 variable "prefix" {
