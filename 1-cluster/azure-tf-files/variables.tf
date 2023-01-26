@@ -12,3 +12,8 @@ variable "akuity_org_name" {
     description = "Organization name in Akuity Platform"
     type        = string
 }
+
+variable "prefix" {
+  description = "Prefix for reaource names"
+  type        = string
+}
