@@ -8,9 +8,5 @@ required_providers {
     source = "akuity/akp"
     version = "~> 0.2"
   }
-  kubectl = {
-    source  = "gavinbunney/kubectl"
-    version = "~> 1.14"
-  }
 }
 }
