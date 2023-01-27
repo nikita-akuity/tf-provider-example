@@ -3,14 +3,14 @@ provider "azurerm" {
 }
 
 locals {
-  aks_cluster_name = "terraform-example-1-cluster"
-  aks_network_name = "terraform-example-1-cluster"
-  aks_subnet_name  = "terraform-example-1-cluster"
-  aks_dns_prefix   = "aks1"
+  aks_cluster_name = "${var.prefix}-tf-example"
+  aks_network_name = "${var.prefix}-vpc"
+  aks_subnet_name  = "${var.prefix}-subnet"
+  aks_dns_prefix   = "${var.prefix}-aks"
 }
 
 resource "azurerm_resource_group" "example" {
-  name     = "terraform-example-1-cluster"
+  name     = "${var.prefix}-tf-example"
   location = var.azure_region
 }
 
