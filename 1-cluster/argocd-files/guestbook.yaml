@@ -30,7 +30,7 @@ spec:
         project: 1-cluster-prod
   template:
     metadata:
-      name: 'guestbook-{{values.env}}'
+      name: 'guestbook-{{values.env}}-{{metadata.labels.cloud}}'
       labels:
         cloud: '{{metadata.labels.cloud}}'
       finalizers:
