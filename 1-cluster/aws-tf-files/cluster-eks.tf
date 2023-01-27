@@ -14,6 +14,10 @@ data "aws_availability_zones" "available" {
   state = "available"
 }
 
+data "aws_eks_cluster_auth" "default" {
+  name = local.eks_cluster_name
+}
+
 module "aws_vpc" {
   source = "terraform-aws-modules/vpc/aws"
   version = "~> 3.0"
