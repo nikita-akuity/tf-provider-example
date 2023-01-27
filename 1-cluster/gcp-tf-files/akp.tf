@@ -8,7 +8,7 @@ data "akp_instance" "argocd" {
 
 resource "akp_cluster" "cluster" {
   instance_id      = data.akp_instance.argocd.id
-  name             = "gke-${var.google_region}"
+  name             = "gcp-${var.google_region}"
   namespace        = "akuity"
   size             = "small"
   labels           = {
