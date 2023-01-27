@@ -7,7 +7,7 @@ spec:
   - clusters:
       selector:
         matchLabels:
-          example: 1-cluster
+          purpose: guestbook
           dev: 'true'
       values:
         env: dev
@@ -15,7 +15,7 @@ spec:
   - clusters:
       selector:
         matchLabels:
-          example: 1-cluster
+          purpose: guestbook
           stage: 'true'
       values:
         env: stage
@@ -23,7 +23,7 @@ spec:
   - clusters:
       selector:
         matchLabels:
-          example: 1-cluster
+          purpose: guestbook
           prod: 'true'
       values:
         env: prod
