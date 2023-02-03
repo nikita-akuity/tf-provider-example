@@ -10,6 +10,8 @@ locals {
   gke_services_range_name = "example-gke-services"
 }
 
+data "google_client_config" "default" {}
+
 module "gcp_vpc" {
   source       = "terraform-google-modules/network/google"
   version      = "~> 6.0"
